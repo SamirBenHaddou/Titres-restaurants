@@ -270,9 +270,10 @@ body {
   background: white;
   border-radius: 20px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 600px;
+  max-width: 420px;
+  width: 95%;
   animation: modalSlideIn 0.3s ease-out;
+  box-sizing: border-box;
 }
 
 @keyframes modalSlideIn {
@@ -337,6 +338,18 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 20px;
+}
+
+/* Empêche les champs de déborder */
+.quick-entry-form .form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.quick-entry-form .form-group {
+  flex: 1 1 120px;
+  min-width: 0;
 }
 
 .modal-footer {
@@ -404,9 +417,7 @@ body {
 }
 
 .readonly-input {
-  background: #f8f9fa !important;
-  color: #666 !important;
-  cursor: not-allowed;
+  background: #f5f5f5;
 }
 
 /* Styles des boutons */

@@ -224,13 +224,23 @@
                   </div>
                   <div class="form-group">
                     <label for="quickGiven">Tickets donnés</label>
-                    <input type="number" id="quickGiven" min="0" value="0" />
+                    <input
+                      type="number"
+                      id="quickGiven"
+                      min="0"
+                      value="0"
+                      onchange="calculateQuickRights()"
+                    />
                   </div>
                 </div>
                 <div class="quick-summary">
                   <div class="quick-calc">
                     <span>Droits calculés : </span>
                     <strong id="quickRights">0</strong>
+                  </div>
+                  <div class="quick-calc">
+                    <span>Solde total sur la période : </span>
+                    <strong id="quickTotalBalance">0</strong>
                   </div>
                 </div>
               </div>
@@ -412,6 +422,27 @@
         }
 
         calculateQuickRights();
+
+        // Calcul du solde total sur la période sélectionnée
+        const startMonth = parseInt(
+          document.getElementById("startMonth").value
+        );
+        const endMonth = parseInt(document.getElementById("endMonth").value);
+        const months = getMonthsInCustomPeriod(startMonth, endMonth);
+
+        let empRights = 0,
+          empGiven = 0;
+        months.forEach((m) => {
+          const key = `${currentYear}-${String(m).padStart(2, "0")}`;
+          const data = employees[currentEmployee][key];
+          if (data) {
+            empRights += data.rights || 0;
+            empGiven += data.ticketsGiven || 0;
+          }
+        });
+        const totalBalance = empRights - empGiven;
+        document.getElementById("quickTotalBalance").textContent =
+          (totalBalance > 0 ? "+" : "") + totalBalance;
       }
 
       function calculateQuickRights() {
@@ -421,6 +452,57 @@
           parseInt(document.getElementById("quickAbsences").value) || 0;
         const rights = Math.max(0, workingDays - absences);
         document.getElementById("quickRights").textContent = rights;
+
+        const ticketsGiven =
+          parseInt(document.getElementById("quickGiven").value) || 0;
+        const balance = rights - ticketsGiven;
+        // Ligne supprimée car l'élément n'existe plus :
+        // document.getElementById("quickBalance").textContent =
+        //   (balance > 0 ? "+" : "") + balance;
+
+        // Mettre à jour le solde total sur la période
+        if (!currentEmployee) return;
+        const startMonth = parseInt(
+          document.getElementById("startMonth").value
+        );
+        const endMonth = parseInt(document.getElementById("endMonth").value);
+        const months = getMonthsInCustomPeriod(startMonth, endMonth);
+
+        let empRights = 0,
+          empGiven = 0;
+        months.forEach((m) => {
+          const key = `${currentYear}-${String(m).padStart(2, "0")}`;
+          const data = employees[currentEmployee][key];
+          if (data) {
+            empRights += data.rights || 0;
+            empGiven += data.ticketsGiven || 0;
+          }
+        });
+
+        // Ajoute les valeurs en cours de saisie si le mois affiché n'est pas encore enregistré
+        const quickMonth = document.getElementById("quickMonth").value;
+        if (months.includes(parseInt(quickMonth.split("-")[1]))) {
+          const currentData = employees[currentEmployee][quickMonth];
+          const currentRights = rights;
+          const currentGiven = ticketsGiven;
+          if (
+            !currentData ||
+            currentData.rights !== currentRights ||
+            currentData.ticketsGiven !== currentGiven
+          ) {
+            // Retire l'ancien si existant, ajoute la saisie en cours
+            if (currentData) {
+              empRights -= currentData.rights || 0;
+              empGiven -= currentData.ticketsGiven || 0;
+            }
+            empRights += currentRights;
+            empGiven += currentGiven;
+          }
+        }
+
+        const totalBalance = empRights - empGiven;
+        document.getElementById("quickTotalBalance").textContent =
+          (totalBalance > 0 ? "+" : "") + totalBalance;
       }
 
       function saveQuickEntry() {
