@@ -156,7 +156,7 @@
           <div class="summary-table">
             <div class="table-header" id="tableHeader">
               <div class="col-employee">Salarié</div>
-              <div class="col-working">J. travaillés</div>
+              <div class="col-working">J. Ouvrés</div>
               <div class="col-absences">Absences</div>
               <div class="col-rights">Droits</div>
               <div class="col-given">Donnés</div>
@@ -204,12 +204,13 @@
                 </div>
                 <div class="form-row">
                   <div class="form-group">
-                    <label for="quickWorkingDays">Jours Travaillés</label>
+                    <label for="quickWorkingDays">Jours Ouvrés</label>
                     <input
                       type="number"
                       id="quickWorkingDays"
-                      readonly
-                      class="readonly-input"
+                      min="0"
+                      value="0"
+                      onchange="calculateQuickRights()"
                     />
                   </div>
                   <div class="form-group">
@@ -295,11 +296,18 @@
 
       // Calculs de jours ouvrés
       function getWorkingDaysInMonth(year, month) {
+        const holidays = getFrenchHolidays(year);
         const date = new Date(year, month - 1, 1);
         let workingDays = 0;
         while (date.getMonth() === month - 1) {
           const dayOfWeek = date.getDay();
-          if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+          const isoDate = [
+            date.getFullYear(),
+            String(date.getMonth() + 1).padStart(2, "0"),
+            String(date.getDate()).padStart(2, "0"),
+          ].join("-");
+          // Jours ouvrés = lundi à vendredi, hors jours fériés
+          if (dayOfWeek >= 1 && dayOfWeek <= 5 && !holidays.includes(isoDate)) {
             workingDays++;
           }
           date.setDate(date.getDate() + 1);
@@ -757,6 +765,65 @@
         ).className = `col-balance ${totalBalanceClass}`;
 
         totalsRow.style.display = "grid";
+      }
+
+      // Retourne un tableau des dates (au format YYYY-MM-DD) des jours fériés français pour une année donnée
+      function getFrenchHolidays(year) {
+        // Jours fériés fixes
+        const holidays = [
+          `${year}-01-01`, // Jour de l'an
+          `${year}-05-01`, // Fête du Travail
+          `${year}-05-08`, // Victoire 1945
+          `${year}-07-14`, // Fête nationale
+          `${year}-08-15`, // Assomption
+          `${year}-11-01`, // Toussaint
+          `${year}-11-11`, // Armistice
+          `${year}-12-25`, // Noël
+        ];
+
+        // Calcul des fêtes mobiles (Pâques, Ascension, Pentecôte)
+        // Algorithme de Butcher pour Pâques
+        function getEasterDate(y) {
+          const f = Math.floor,
+            G = y % 19,
+            C = f(y / 100),
+            H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30,
+            I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11)),
+            J = (y + f(y / 4) + I + 2 - C + f(C / 4)) % 7,
+            L = I - J,
+            month = 3 + f((L + 40) / 44),
+            day = L + 28 - 31 * f(month / 4);
+          return new Date(y, month - 1, day);
+        }
+
+        function formatDate(d) {
+          return [
+            d.getFullYear(),
+            String(d.getMonth() + 1).padStart(2, "0"),
+            String(d.getDate()).padStart(2, "0"),
+          ].join("-");
+        }
+
+        const easter = getEasterDate(year);
+        const easterMonday = new Date(easter);
+        easterMonday.setDate(easter.getDate() + 1);
+
+        const ascension = new Date(easter);
+        ascension.setDate(easter.getDate() + 39);
+
+        const pentecost = new Date(easter);
+        pentecost.setDate(easter.getDate() + 50);
+
+        const pentecostMonday = new Date(easter);
+        pentecostMonday.setDate(easter.getDate() + 51);
+
+        holidays.push(
+          formatDate(easterMonday), // Lundi de Pâques
+          formatDate(ascension), // Ascension
+          formatDate(pentecostMonday) // Lundi de Pentecôte
+        );
+
+        return holidays;
       }
 
       // Initialisation
