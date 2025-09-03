@@ -10,381 +10,581 @@
     <div class="container">
       <header class="header">
         <h1>🍽️ Gestionnaire de Tickets Restaurant</h1>
-        <p>
-          Calculez automatiquement les droits annuels et les régularisations
-        </p>
+        <p>Vue simplifiée pour tous les salariés</p>
       </header>
 
       <main class="content">
-        <section class="year-selection">
-          <h2>Année de référence</h2>
-          <div class="year-row">
+        <!-- Section de contrôles principaux -->
+        <section class="main-controls">
+          <h2>Période et contrôles</h2>
+          <div class="controls-row">
             <div class="form-group">
               <label for="referenceYear">Année</label>
-              <select id="referenceYear" onchange="updateAllCalculations()">
+              <select id="referenceYear" onchange="updateData()">
                 <option value="2023">2023</option>
                 <option value="2024" selected>2024</option>
                 <option value="2025">2025</option>
               </select>
             </div>
-            <div class="year-info">
-              <div class="info-badge">
-                <span class="badge-label">Jours ouvrés de l'année :</span>
-                <span class="badge-value" id="yearWorkingDays">-</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <h2>Ajouter / Modifier un salarié</h2>
-          <div class="form-row">
             <div class="form-group">
-              <label for="employeeName">Nom du salarié</label>
+              <label for="periodFilter">Période</label>
+              <select id="periodFilter" onchange="updateData()">
+                <option value="all">Toute l'année</option>
+                <option value="quarter1">T1 (Jan-Mar)</option>
+                <option value="quarter2">T2 (Avr-Juin)</option>
+                <option value="quarter3">T3 (Juil-Sep)</option>
+                <option value="quarter4">T4 (Oct-Déc)</option>
+                <option value="semester1">S1 (Jan-Juin)</option>
+                <option value="semester2">S2 (Juil-Déc)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="newEmployeeName">Ajouter salarié</label>
               <input
                 type="text"
-                id="employeeName"
-                placeholder="Ex: Marie Dupont"
+                id="newEmployeeName"
+                placeholder="Nom du salarié"
               />
             </div>
             <div class="form-group">
-              <label for="totalAbsences">Total absences depuis janvier</label>
-              <input
-                type="number"
-                id="totalAbsences"
-                min="0"
-                value="0"
-                placeholder="Ex: 15"
-                onchange="updateCurrentCalculation()"
-              />
-            </div>
-            <div class="form-group">
-              <label for="ticketsAlreadyGiven">Tickets déjà donnés</label>
-              <input
-                type="number"
-                id="ticketsAlreadyGiven"
-                min="0"
-                value="0"
-                placeholder="Ex: 180"
-                onchange="updateCurrentCalculation()"
-              />
-            </div>
-            <div class="form-group">
-              <button class="btn btn-add" onclick="addOrUpdateEmployee()">
-                Ajouter / Modifier
+              <button class="btn btn-create" onclick="addEmployee()">
+                Ajouter
               </button>
             </div>
           </div>
-          <div class="calculation-info" id="calculationInfo">
-            <div class="info-item">
-              <span class="info-label">Droits acquis depuis janvier :</span>
-              <span class="info-value" id="totalRights">-</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Tickets déjà donnés :</span>
-              <span class="info-value" id="ticketsGivenDisplay">0</span>
-            </div>
-            <div class="info-item total">
-              <span class="info-label"
-                >Régularisation (à donner/reprendre) :</span
-              >
-              <span class="info-value" id="regularization">-</span>
-            </div>
+        </section>
+
+        <!-- Section de gestion des données -->
+        <section class="data-management">
+          <h3>💾 Gestion des données</h3>
+          <div class="data-buttons">
+            <button class="btn btn-secondary" onclick="exportData()">
+              📤 Exporter données
+            </button>
+            <input
+              type="file"
+              id="importFile"
+              accept=".json"
+              style="display: none"
+              onchange="importData()"
+            />
+            <button
+              class="btn btn-secondary"
+              onclick="document.getElementById('importFile').click()"
+            >
+              📥 Importer données
+            </button>
+            <button class="btn btn-danger" onclick="clearAllData()">
+              🗑️ Effacer tout
+            </button>
+          </div>
+          <div class="storage-info">
+            <p>
+              <strong>💡 Important :</strong> Vos données sont sauvegardées
+              automatiquement dans votre navigateur. Utilisez l'export pour
+              créer une sauvegarde ou transférer vos données.
+            </p>
           </div>
         </section>
 
-        <section class="distribution-section">
-          <h2>Distribution du mois</h2>
-          <div class="distribution-row">
-            <div class="form-group">
-              <label for="distributionMonth">Mois de distribution</label>
-              <input
-                type="month"
-                id="distributionMonth"
-                onchange="updateDistributionCalculations()"
-              />
+        <!-- Tableau récapitulatif -->
+        <section class="summary-section">
+          <h2>📊 Récapitulatif des salariés</h2>
+          <div class="period-info" id="periodInfo">
+            <span class="info-text"
+              >Période sélectionnée :
+              <strong id="selectedPeriodText">Toute l'année 2024</strong></span
+            >
+            <span class="info-badge">
+              <span class="badge-label">Jours ouvrés :</span>
+              <span class="badge-value" id="periodWorkingDays">-</span>
+            </span>
+          </div>
+
+          <div class="summary-table">
+            <div class="table-header" id="tableHeader">
+              <div class="col-employee">Salarié</div>
+              <div class="col-working">J. ouvrés</div>
+              <div class="col-absences">Absences</div>
+              <div class="col-rights">Droits</div>
+              <div class="col-given">Donnés</div>
+              <div class="col-balance">Solde</div>
+              <div class="col-actions">Actions</div>
             </div>
-            <div class="distribution-info">
-              <div class="info-badge">
-                <span class="badge-label"
-                  >Prévision jours ouvrés du mois :</span
-                >
-                <span class="badge-value" id="monthWorkingDays">-</span>
+            <div id="summaryContainer">
+              <div class="empty-state">
+                <p>
+                  Aucun salarié ajouté. Commencez par ajouter un salarié
+                  ci-dessus.
+                </p>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section class="employees-list" id="employeesList">
-          <div class="list-header">
-            <div class="header-grid">
-              <div>Salarié</div>
-              <div>Droits acquis</div>
-              <div>Tickets donnés</div>
-              <div>Régul. actuelle</div>
-              <div>Prévision mois</div>
-              <div>Total à donner</div>
-              <div>Action</div>
-            </div>
-          </div>
-          <div id="employeesContainer">
-            <div class="empty-state">
-              <p>Aucun salarié ajouté pour le moment</p>
-              <p>Utilisez le formulaire ci-dessus pour ajouter des salariés</p>
+            <div class="table-totals" id="tableTotals" style="display: none">
+              <div class="col-employee"><strong>TOTAUX</strong></div>
+              <div class="col-working" id="totalWorking">0</div>
+              <div class="col-absences" id="totalAbsences">0</div>
+              <div class="col-rights" id="totalRights">0</div>
+              <div class="col-given" id="totalGiven">0</div>
+              <div class="col-balance" id="totalBalance">0</div>
+              <div class="col-actions"></div>
             </div>
           </div>
         </section>
 
-        <section class="summary" id="summary">
-          <h3>📊 Résumé de la distribution</h3>
-          <div class="summary-stats">
-            <div class="stat-item">
-              <div class="stat-number" id="totalEmployees">0</div>
-              <div class="stat-label">Salariés</div>
+        <!-- Modal de saisie rapide -->
+        <div class="modal" id="quickEntryModal" style="display: none">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>⚡ Saisie rapide - <span id="modalEmployeeName">-</span></h3>
+              <button class="modal-close" onclick="closeModal()">
+                &times;
+              </button>
             </div>
-            <div class="stat-item">
-              <div class="stat-number" id="totalTicketsToGive">0</div>
-              <div class="stat-label">Tickets à distribuer</div>
+            <div class="modal-body">
+              <div class="quick-entry-form">
+                <div class="form-group">
+                  <label for="quickMonth">Mois</label>
+                  <input
+                    type="month"
+                    id="quickMonth"
+                    onchange="loadQuickMonthData()"
+                  />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="quickWorkingDays">Jours ouvrés</label>
+                    <input
+                      type="number"
+                      id="quickWorkingDays"
+                      readonly
+                      class="readonly-input"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="quickAbsences">Absences</label>
+                    <input
+                      type="number"
+                      id="quickAbsences"
+                      min="0"
+                      value="0"
+                      onchange="calculateQuickRights()"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="quickGiven">Tickets donnés</label>
+                    <input type="number" id="quickGiven" min="0" value="0" />
+                  </div>
+                </div>
+                <div class="quick-summary">
+                  <div class="quick-calc">
+                    <span>Droits calculés : </span>
+                    <strong id="quickRights">0</strong>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="stat-item">
-              <div class="stat-number" id="totalRegularization">0</div>
-              <div class="stat-label">Régularisation totale</div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" onclick="saveQuickEntry()">
+                Enregistrer
+              </button>
+              <button class="btn btn-secondary" onclick="closeModal()">
+                Annuler
+              </button>
             </div>
           </div>
-        </section>
+        </div>
       </main>
     </div>
 
     <script>
-      let employees = [];
+      let employees = {};
+      let currentYear = new Date().getFullYear();
+      let currentEmployee = null;
 
-      // Fonction pour calculer les jours ouvrés d'un mois (lundi à vendredi)
+      // Fonction de stockage local
+      function saveToStorage() {
+        try {
+          localStorage.setItem(
+            "ticketRestaurantData",
+            JSON.stringify(employees)
+          );
+          localStorage.setItem("ticketRestaurantYear", currentYear.toString());
+        } catch (e) {
+          console.warn("Impossible de sauvegarder dans localStorage:", e);
+        }
+      }
+
+      function loadFromStorage() {
+        try {
+          const data = localStorage.getItem("ticketRestaurantData");
+          const year = localStorage.getItem("ticketRestaurantYear");
+          if (data) {
+            employees = JSON.parse(data);
+          }
+          if (year) {
+            currentYear = parseInt(year);
+            document.getElementById("referenceYear").value = currentYear;
+          }
+        } catch (e) {
+          console.warn("Impossible de charger depuis localStorage:", e);
+          employees = {};
+        }
+      }
+
+      // Calculs de jours ouvrés
       function getWorkingDaysInMonth(year, month) {
         const date = new Date(year, month - 1, 1);
         let workingDays = 0;
-
         while (date.getMonth() === month - 1) {
           const dayOfWeek = date.getDay();
           if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-            // Lundi (1) à Vendredi (5)
             workingDays++;
           }
           date.setDate(date.getDate() + 1);
         }
-
         return workingDays;
       }
 
-      // Fonction pour calculer les jours ouvrés de janvier jusqu'à maintenant
-      function getWorkingDaysFromJanuary(year, currentMonth = null) {
-        const now = new Date();
-        const endMonth = currentMonth
-          ? currentMonth
-          : year === now.getFullYear()
-          ? now.getMonth() + 1
-          : 12;
-
+      function getWorkingDaysInYear(year) {
         let totalDays = 0;
-        for (let month = 1; month <= endMonth; month++) {
+        for (let month = 1; month <= 12; month++) {
           totalDays += getWorkingDaysInMonth(year, month);
         }
-
         return totalDays;
       }
 
-      // Fonction pour calculer les jours ouvrés de toute l'année
-      function getWorkingDaysInYear(year) {
-        return getWorkingDaysFromJanuary(year, 12);
+      function getMonthsInPeriod(period) {
+        const quarters = {
+          quarter1: [1, 2, 3],
+          quarter2: [4, 5, 6],
+          quarter3: [7, 8, 9],
+          quarter4: [10, 11, 12],
+          semester1: [1, 2, 3, 4, 5, 6],
+          semester2: [7, 8, 9, 10, 11, 12],
+          all: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        return quarters[period] || quarters.all;
       }
 
-      function updateAllCalculations() {
-        const year = parseInt(document.getElementById("referenceYear").value);
-        const yearWorkingDays = getWorkingDaysInYear(year);
-        document.getElementById("yearWorkingDays").textContent =
-          yearWorkingDays + " jours";
-
-        updateCurrentCalculation();
-        updateDistributionCalculations();
-        updateDisplay();
+      function getPeriodWorkingDays(year, period) {
+        const months = getMonthsInPeriod(period);
+        return months.reduce(
+          (total, month) => total + getWorkingDaysInMonth(year, month),
+          0
+        );
       }
 
-      function updateCurrentCalculation() {
-        const year = parseInt(document.getElementById("referenceYear").value);
-        const totalAbsences =
-          parseInt(document.getElementById("totalAbsences").value) || 0;
-        const ticketsAlreadyGiven =
-          parseInt(document.getElementById("ticketsAlreadyGiven").value) || 0;
-
-        const now = new Date();
-        const workingDaysFromJanuary = getWorkingDaysFromJanuary(year);
-        const totalRights = Math.max(0, workingDaysFromJanuary - totalAbsences);
-        const regularization = totalRights - ticketsAlreadyGiven;
-
-        document.getElementById("totalRights").textContent =
-          totalRights + " tickets";
-        document.getElementById("ticketsGivenDisplay").textContent =
-          ticketsAlreadyGiven + " tickets";
-
-        const regElement = document.getElementById("regularization");
-        if (regularization > 0) {
-          regElement.textContent = "+" + regularization + " tickets (à donner)";
-          regElement.className = "info-value positive";
-        } else if (regularization < 0) {
-          regElement.textContent = regularization + " tickets (trop donné)";
-          regElement.className = "info-value negative";
-        } else {
-          regElement.textContent = "0 ticket (équilibré)";
-          regElement.className = "info-value neutral";
-        }
-      }
-
-      function updateDistributionCalculations() {
-        const distributionMonth =
-          document.getElementById("distributionMonth").value;
-        if (distributionMonth) {
-          const [year, month] = distributionMonth.split("-").map(Number);
-          const monthWorkingDays = getWorkingDaysInMonth(year, month);
-          document.getElementById("monthWorkingDays").textContent =
-            monthWorkingDays + " jours";
-        }
-        updateDisplay();
-      }
-
-      function addOrUpdateEmployee() {
-        const name = document.getElementById("employeeName").value.trim();
-        const totalAbsences =
-          parseInt(document.getElementById("totalAbsences").value) || 0;
-        const ticketsAlreadyGiven =
-          parseInt(document.getElementById("ticketsAlreadyGiven").value) || 0;
-
+      // Gestion des employés
+      function addEmployee() {
+        const name = document.getElementById("newEmployeeName").value.trim();
         if (!name) {
-          alert("Veuillez remplir le nom du salarié");
+          alert("Veuillez entrer un nom");
+          return;
+        }
+        if (employees[name]) {
+          alert("Ce salarié existe déjà");
+          return;
+        }
+        employees[name] = {};
+        document.getElementById("newEmployeeName").value = "";
+        saveToStorage();
+        updateData();
+      }
+
+      function removeEmployee(name) {
+        if (
+          confirm(
+            `Êtes-vous sûr de vouloir supprimer ${name} et toutes ses données ?`
+          )
+        ) {
+          delete employees[name];
+          saveToStorage();
+          updateData();
+        }
+      }
+
+      // Modal de saisie rapide
+      function openQuickEntry(employeeName) {
+        currentEmployee = employeeName;
+        document.getElementById("modalEmployeeName").textContent = employeeName;
+
+        // Définir le mois actuel par défaut
+        const now = new Date();
+        const currentMonth =
+          currentYear + "-" + String(now.getMonth() + 1).padStart(2, "0");
+        document.getElementById("quickMonth").value = currentMonth;
+
+        loadQuickMonthData();
+        document.getElementById("quickEntryModal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("quickEntryModal").style.display = "none";
+        currentEmployee = null;
+      }
+
+      function loadQuickMonthData() {
+        const monthValue = document.getElementById("quickMonth").value;
+        if (!monthValue || !currentEmployee) return;
+
+        const [year, month] = monthValue.split("-").map(Number);
+        const workingDays = getWorkingDaysInMonth(year, month);
+        document.getElementById("quickWorkingDays").value = workingDays;
+
+        const monthData = employees[currentEmployee][monthValue];
+        if (monthData) {
+          document.getElementById("quickAbsences").value =
+            monthData.absences || 0;
+          document.getElementById("quickGiven").value =
+            monthData.ticketsGiven || 0;
+        } else {
+          document.getElementById("quickAbsences").value = 0;
+          document.getElementById("quickGiven").value = 0;
+        }
+
+        calculateQuickRights();
+      }
+
+      function calculateQuickRights() {
+        const workingDays =
+          parseInt(document.getElementById("quickWorkingDays").value) || 0;
+        const absences =
+          parseInt(document.getElementById("quickAbsences").value) || 0;
+        const rights = Math.max(0, workingDays - absences);
+        document.getElementById("quickRights").textContent = rights;
+      }
+
+      function saveQuickEntry() {
+        if (!currentEmployee) return;
+
+        const monthValue = document.getElementById("quickMonth").value;
+        const workingDays =
+          parseInt(document.getElementById("quickWorkingDays").value) || 0;
+        const absences =
+          parseInt(document.getElementById("quickAbsences").value) || 0;
+        const ticketsGiven =
+          parseInt(document.getElementById("quickGiven").value) || 0;
+
+        if (!employees[currentEmployee]) {
+          employees[currentEmployee] = {};
+        }
+
+        employees[currentEmployee][monthValue] = {
+          workingDays: workingDays,
+          absences: absences,
+          rights: Math.max(0, workingDays - absences),
+          ticketsGiven: ticketsGiven,
+          difference: Math.max(0, workingDays - absences) - ticketsGiven,
+        };
+
+        saveToStorage();
+        updateData();
+        closeModal();
+      }
+
+      // Gestion des données
+      function exportData() {
+        const dataToExport = {
+          employees: employees,
+          exportDate: new Date().toISOString(),
+          year: currentYear,
+        };
+
+        const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
+          type: "application/json",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tickets-restaurant-${currentYear}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function importData() {
+        const file = document.getElementById("importFile").files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (data.employees) {
+              employees = data.employees;
+              if (data.year) {
+                currentYear = data.year;
+                document.getElementById("referenceYear").value = currentYear;
+              }
+              saveToStorage();
+              updateData();
+              alert("Données importées avec succès !");
+            } else {
+              alert("Format de fichier invalide");
+            }
+          } catch (error) {
+            alert("Erreur lors de l'importation : " + error.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function clearAllData() {
+        if (
+          confirm(
+            "Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible."
+          )
+        ) {
+          employees = {};
+          saveToStorage();
+          updateData();
+        }
+      }
+
+      // Mise à jour de l'affichage
+      function updateData() {
+        currentYear = parseInt(document.getElementById("referenceYear").value);
+        const period = document.getElementById("periodFilter").value;
+
+        // Mettre à jour les informations de période
+        updatePeriodInfo(period);
+
+        // Mettre à jour le tableau
+        updateSummaryTable(period);
+
+        saveToStorage();
+      }
+
+      function updatePeriodInfo(period) {
+        const periodTexts = {
+          all: `Toute l'année ${currentYear}`,
+          quarter1: `T1 ${currentYear} (Jan-Mar)`,
+          quarter2: `T2 ${currentYear} (Avr-Juin)`,
+          quarter3: `T3 ${currentYear} (Juil-Sep)`,
+          quarter4: `T4 ${currentYear} (Oct-Déc)`,
+          semester1: `S1 ${currentYear} (Jan-Juin)`,
+          semester2: `S2 ${currentYear} (Juil-Déc)`,
+        };
+
+        document.getElementById("selectedPeriodText").textContent =
+          periodTexts[period];
+
+        const workingDays = getPeriodWorkingDays(currentYear, period);
+        document.getElementById("periodWorkingDays").textContent =
+          workingDays + " jours";
+      }
+
+      function updateSummaryTable(period) {
+        const container = document.getElementById("summaryContainer");
+        const totalsRow = document.getElementById("tableTotals");
+
+        const employeeNames = Object.keys(employees);
+
+        if (employeeNames.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state"><p>Aucun salarié ajouté. Commencez par ajouter un salarié ci-dessus.</p></div>';
+          totalsRow.style.display = "none";
           return;
         }
 
-        // Vérifier si l'employé existe déjà
-        const existingIndex = employees.findIndex(
-          (emp) => emp.name.toLowerCase() === name.toLowerCase()
-        );
+        const months = getMonthsInPeriod(period);
+        let totalWorking = 0,
+          totalAbsences = 0,
+          totalRights = 0,
+          totalGiven = 0;
 
-        const year = parseInt(document.getElementById("referenceYear").value);
-        const workingDaysFromJanuary = getWorkingDaysFromJanuary(year);
-        const totalRights = Math.max(0, workingDaysFromJanuary - totalAbsences);
-        const regularization = totalRights - ticketsAlreadyGiven;
+        const rows = employeeNames
+          .map((name) => {
+            const employeeData = employees[name];
+            let empWorking = 0,
+              empAbsences = 0,
+              empRights = 0,
+              empGiven = 0;
 
-        const employeeData = {
-          id: existingIndex >= 0 ? employees[existingIndex].id : Date.now(),
-          name: name,
-          year: year,
-          totalAbsences: totalAbsences,
-          ticketsAlreadyGiven: ticketsAlreadyGiven,
-          totalRights: totalRights,
-          regularization: regularization,
-        };
+            months.forEach((month) => {
+              const monthKey = `${currentYear}-${String(month).padStart(
+                2,
+                "0"
+              )}`;
+              const monthData = employeeData[monthKey];
 
-        if (existingIndex >= 0) {
-          employees[existingIndex] = employeeData;
-        } else {
-          employees.push(employeeData);
-        }
+              if (monthData) {
+                empWorking += monthData.workingDays || 0;
+                empAbsences += monthData.absences || 0;
+                empRights += monthData.rights || 0;
+                empGiven += monthData.ticketsGiven || 0;
+              }
+            });
 
-        updateDisplay();
-        clearForm();
+            const balance = empRights - empGiven;
+            const balanceClass =
+              balance > 0
+                ? "status-positive"
+                : balance < 0
+                ? "status-negative"
+                : "status-neutral";
+            const balanceText =
+              balance > 0 ? "+" + balance : balance.toString();
+
+            totalWorking += empWorking;
+            totalAbsences += empAbsences;
+            totalRights += empRights;
+            totalGiven += empGiven;
+
+            return `
+            <div class="table-row">
+              <div class="col-employee"><strong>${name}</strong></div>
+              <div class="col-working">${empWorking}</div>
+              <div class="col-absences">${empAbsences}</div>
+              <div class="col-rights">${empRights}</div>
+              <div class="col-given">${empGiven}</div>
+              <div class="col-balance ${balanceClass}">${balanceText}</div>
+              <div class="col-actions">
+                <button class="btn btn-edit" onclick="openQuickEntry('${name}')">✏️ Saisir</button>
+                <button class="btn btn-delete" onclick="removeEmployee('${name}')">🗑️</button>
+              </div>
+            </div>
+          `;
+          })
+          .join("");
+
+        container.innerHTML = rows;
+
+        // Mise à jour des totaux
+        const totalBalance = totalRights - totalGiven;
+        const totalBalanceClass =
+          totalBalance > 0
+            ? "status-positive"
+            : totalBalance < 0
+            ? "status-negative"
+            : "status-neutral";
+        const totalBalanceText =
+          totalBalance > 0 ? "+" + totalBalance : totalBalance.toString();
+
+        document.getElementById("totalWorking").textContent = totalWorking;
+        document.getElementById("totalAbsences").textContent = totalAbsences;
+        document.getElementById("totalRights").textContent = totalRights;
+        document.getElementById("totalGiven").textContent = totalGiven;
+        document.getElementById("totalBalance").textContent = totalBalanceText;
+        document.getElementById(
+          "totalBalance"
+        ).className = `col-balance ${totalBalanceClass}`;
+
+        totalsRow.style.display = "grid";
       }
 
-      function removeEmployee(id) {
-        employees = employees.filter((emp) => emp.id !== id);
-        updateDisplay();
-      }
-
-      function updateDisplay() {
-        const container = document.getElementById("employeesContainer");
-        const distributionMonth =
-          document.getElementById("distributionMonth").value;
-        let monthPrevision = 0;
-
-        if (distributionMonth) {
-          const [year, month] = distributionMonth.split("-").map(Number);
-          monthPrevision = getWorkingDaysInMonth(year, month);
-        }
-
-        if (employees.length === 0) {
-          container.innerHTML = `
-                    <div class="empty-state">
-                        <p>Aucun salarié ajouté pour le moment</p>
-                        <p>Utilisez le formulaire ci-dessus pour ajouter des salariés</p>
-                    </div>
-                `;
-        } else {
-          container.innerHTML = employees
-            .map((emp) => {
-              const totalToGive = emp.regularization + monthPrevision;
-              const regClass =
-                emp.regularization > 0
-                  ? "positive"
-                  : emp.regularization < 0
-                  ? "negative"
-                  : "neutral";
-              const regText =
-                emp.regularization > 0
-                  ? "+" + emp.regularization
-                  : emp.regularization.toString();
-
-              return `
-                        <div class="employee-item">
-                            <div class="employee-name">${emp.name}</div>
-                            <div class="employee-info">${emp.totalRights} tickets</div>
-                            <div class="employee-info">${emp.ticketsAlreadyGiven} tickets</div>
-                            <div class="employee-info ${regClass}">${regText}</div>
-                            <div class="employee-info">${monthPrevision} tickets</div>
-                            <div class="tickets-count">${totalToGive} tickets</div>
-                            <button class="btn btn-remove" onclick="removeEmployee(${emp.id})">
-                                ✕ Supprimer
-                            </button>
-                        </div>
-                    `;
-            })
-            .join("");
-        }
-
-        updateSummary(monthPrevision);
-      }
-
-      function updateSummary(monthPrevision) {
-        const totalEmployees = employees.length;
-        const totalRegularization = employees.reduce(
-          (sum, emp) => sum + emp.regularization,
-          0
-        );
-        const totalTicketsToGive = employees.reduce(
-          (sum, emp) => sum + emp.regularization + monthPrevision,
-          0
-        );
-
-        document.getElementById("totalEmployees").textContent = totalEmployees;
-        document.getElementById("totalTicketsToGive").textContent =
-          totalTicketsToGive;
-        document.getElementById("totalRegularization").textContent =
-          totalRegularization;
-      }
-
-      function clearForm() {
-        document.getElementById("employeeName").value = "";
-        document.getElementById("totalAbsences").value = "0";
-        document.getElementById("ticketsAlreadyGiven").value = "0";
-        updateCurrentCalculation();
-      }
-
-      // Initialisation au chargement de la page
+      // Initialisation
       window.onload = function () {
-        const now = new Date();
-        const currentMonth =
-          now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
-        document.getElementById("distributionMonth").value = currentMonth;
-        document.getElementById("referenceYear").value = now
-          .getFullYear()
-          .toString();
-        updateAllCalculations();
+        loadFromStorage();
+        updateData();
+      };
+
+      // Fermeture du modal en cliquant à l'extérieur
+      window.onclick = function (event) {
+        const modal = document.getElementById("quickEntryModal");
+        if (event.target === modal) {
+          closeModal();
+        }
       };
     </script>
   </body>
