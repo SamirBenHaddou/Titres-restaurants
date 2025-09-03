@@ -415,16 +415,19 @@
         if (!monthValue || !currentEmployee) return;
 
         const [year, month] = monthValue.split("-").map(Number);
-        const workingDays = getWorkingDaysInMonth(year, month);
-        document.getElementById("quickWorkingDays").value = workingDays;
-
         const monthData = employees[currentEmployee][monthValue];
         if (monthData) {
+          document.getElementById("quickWorkingDays").value =
+            typeof monthData.workingDays === "number"
+              ? monthData.workingDays
+              : getWorkingDaysInMonth(year, month);
           document.getElementById("quickAbsences").value =
             monthData.absences || 0;
           document.getElementById("quickGiven").value =
             monthData.ticketsGiven || 0;
         } else {
+          document.getElementById("quickWorkingDays").value =
+            getWorkingDaysInMonth(year, month);
           document.getElementById("quickAbsences").value = 0;
           document.getElementById("quickGiven").value = 0;
         }
