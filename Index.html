@@ -22,8 +22,9 @@
               <label for="referenceYear">Année</label>
               <select id="referenceYear" onchange="updateYearAndData()">
                 <option value="2023">2023</option>
-                <option value="2024" selected>2024</option>
+                <option value="2024">2024</option>
                 <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
               </select>
             </div>
             <div class="form-group">
@@ -434,7 +435,7 @@
 
         calculateQuickRights();
 
-        // Calcul du solde total sur la période sélectionnée
+        // Calcul du solde total sur la période sélectionnée (toutes années)
         const startMonth = parseInt(
           document.getElementById("startMonth").value
         );
@@ -443,14 +444,20 @@
 
         let empRights = 0,
           empGiven = 0;
-        months.forEach((m) => {
-          const key = `${currentYear}-${String(m).padStart(2, "0")}`;
-          const data = employees[currentEmployee][key];
-          if (data) {
-            empRights += data.rights || 0;
-            empGiven += data.ticketsGiven || 0;
-          }
-        });
+
+        // Itérer sur tous les mois/années de l'employé
+        if (employees[currentEmployee]) {
+          Object.keys(employees[currentEmployee]).forEach((key) => {
+            const monthNum = parseInt(key.split("-")[1]);
+            if (months.includes(monthNum)) {
+              const data = employees[currentEmployee][key];
+              if (data) {
+                empRights += data.rights || 0;
+                empGiven += data.ticketsGiven || 0;
+              }
+            }
+          });
+        }
         const totalBalance = empRights - empGiven;
         document.getElementById("quickTotalBalance").textContent =
           (totalBalance > 0 ? "+" : "") + totalBalance;
@@ -471,7 +478,7 @@
         // document.getElementById("quickBalance").textContent =
         //   (balance > 0 ? "+" : "") + balance;
 
-        // Mettre à jour le solde total sur la période
+        // Mettre à jour le solde total sur la période (toutes années)
         if (!currentEmployee) return;
         const startMonth = parseInt(
           document.getElementById("startMonth").value
@@ -481,14 +488,20 @@
 
         let empRights = 0,
           empGiven = 0;
-        months.forEach((m) => {
-          const key = `${currentYear}-${String(m).padStart(2, "0")}`;
-          const data = employees[currentEmployee][key];
-          if (data) {
-            empRights += data.rights || 0;
-            empGiven += data.ticketsGiven || 0;
-          }
-        });
+
+        // Itérer sur tous les mois/années de l'employé
+        if (employees[currentEmployee]) {
+          Object.keys(employees[currentEmployee]).forEach((key) => {
+            const monthNum = parseInt(key.split("-")[1]);
+            if (months.includes(monthNum)) {
+              const data = employees[currentEmployee][key];
+              if (data) {
+                empRights += data.rights || 0;
+                empGiven += data.ticketsGiven || 0;
+              }
+            }
+          });
+        }
 
         // Ajoute les valeurs en cours de saisie si le mois affiché n'est pas encore enregistré
         const quickMonth = document.getElementById("quickMonth").value;
