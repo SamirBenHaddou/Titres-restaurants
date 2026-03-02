@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -270,7 +270,7 @@
         try {
           localStorage.setItem(
             "ticketRestaurantData",
-            JSON.stringify(employees)
+            JSON.stringify(employees),
           );
           localStorage.setItem("ticketRestaurantYear", currentYear.toString());
         } catch (e) {
@@ -351,7 +351,7 @@
         const months = getMonthsInCustomPeriod(startMonth, endMonth);
         return months.reduce(
           (total, month) => total + getWorkingDaysInMonth(year, month),
-          0
+          0,
         );
       }
 
@@ -382,7 +382,7 @@
       function removeEmployee(name) {
         if (
           confirm(
-            `Êtes-vous sûr de vouloir supprimer ${name} et toutes ses données ?`
+            `Êtes-vous sûr de vouloir supprimer ${name} et toutes ses données ?`,
           )
         ) {
           delete employees[name];
@@ -437,7 +437,7 @@
 
         // Calcul du solde total sur la période sélectionnée (toutes années)
         const startMonth = parseInt(
-          document.getElementById("startMonth").value
+          document.getElementById("startMonth").value,
         );
         const endMonth = parseInt(document.getElementById("endMonth").value);
         const months = getMonthsInCustomPeriod(startMonth, endMonth);
@@ -481,7 +481,7 @@
         // Mettre à jour le solde total sur la période (toutes années)
         if (!currentEmployee) return;
         const startMonth = parseInt(
-          document.getElementById("startMonth").value
+          document.getElementById("startMonth").value,
         );
         const endMonth = parseInt(document.getElementById("endMonth").value);
         const months = getMonthsInCustomPeriod(startMonth, endMonth);
@@ -607,7 +607,7 @@
       function clearAllData() {
         if (
           confirm(
-            "Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible."
+            "Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible.",
           )
         ) {
           employees = {};
@@ -625,7 +625,7 @@
       // Mise à jour de l'affichage
       function updateData() {
         const startMonth = parseInt(
-          document.getElementById("startMonth").value
+          document.getElementById("startMonth").value,
         );
         const endMonth = parseInt(document.getElementById("endMonth").value);
 
@@ -678,7 +678,7 @@
         const workingDays = getPeriodWorkingDays(
           currentYear,
           startMonth,
-          endMonth
+          endMonth,
         );
         document.getElementById("periodWorkingDays").textContent =
           workingDays + " jours";
@@ -711,18 +711,17 @@
               empRights = 0,
               empGiven = 0;
 
-            months.forEach((month) => {
-              const monthKey = `${currentYear}-${String(month).padStart(
-                2,
-                "0"
-              )}`;
-              const monthData = employeeData[monthKey];
-
-              if (monthData) {
-                empWorking += monthData.workingDays || 0;
-                empAbsences += monthData.absences || 0;
-                empRights += monthData.rights || 0;
-                empGiven += monthData.ticketsGiven || 0;
+            // Itérer sur toutes les entrées de l'employé pour cumuler les années
+            Object.keys(employeeData).forEach((monthKey) => {
+              const monthNum = parseInt(monthKey.split("-")[1]);
+              if (months.includes(monthNum)) {
+                const monthData = employeeData[monthKey];
+                if (monthData) {
+                  empWorking += monthData.workingDays || 0;
+                  empAbsences += monthData.absences || 0;
+                  empRights += monthData.rights || 0;
+                  empGiven += monthData.ticketsGiven || 0;
+                }
               }
             });
 
@@ -731,8 +730,8 @@
               balance > 0
                 ? "status-positive"
                 : balance < 0
-                ? "status-negative"
-                : "status-neutral";
+                  ? "status-negative"
+                  : "status-neutral";
             const balanceText =
               balance > 0 ? "+" + balance : balance.toString();
 
@@ -766,8 +765,8 @@
           totalBalance > 0
             ? "status-positive"
             : totalBalance < 0
-            ? "status-negative"
-            : "status-neutral";
+              ? "status-negative"
+              : "status-neutral";
         const totalBalanceText =
           totalBalance > 0 ? "+" + totalBalance : totalBalance.toString();
 
@@ -776,9 +775,8 @@
         document.getElementById("totalRights").textContent = totalRights;
         document.getElementById("totalGiven").textContent = totalGiven;
         document.getElementById("totalBalance").textContent = totalBalanceText;
-        document.getElementById(
-          "totalBalance"
-        ).className = `col-balance ${totalBalanceClass}`;
+        document.getElementById("totalBalance").className =
+          `col-balance ${totalBalanceClass}`;
 
         totalsRow.style.display = "grid";
       }
@@ -836,7 +834,7 @@
         holidays.push(
           formatDate(easterMonday), // Lundi de Pâques
           formatDate(ascension), // Ascension
-          formatDate(pentecostMonday) // Lundi de Pentecôte
+          formatDate(pentecostMonday), // Lundi de Pentecôte
         );
 
         return holidays;
