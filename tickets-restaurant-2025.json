@@ -1,0 +1,755 @@
+{
+  "employees": {
+    "SERVILLAT Maryline": {
+      "2025-06": {
+        "workingDays": 20,
+        "absences": 1,
+        "rights": 19,
+        "ticketsGiven": 21,
+        "difference": -2
+      },
+      "2025-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 21,
+        "difference": 1
+      },
+      "2025-08": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 21,
+        "difference": -1
+      },
+      "2025-09": {
+        "workingDays": 22,
+        "absences": 12,
+        "rights": 10,
+        "ticketsGiven": 20,
+        "difference": -10
+      },
+      "2025-10": {
+        "workingDays": 23,
+        "absences": 0,
+        "rights": 23,
+        "ticketsGiven": 11,
+        "difference": 12
+      },
+      "2025-11": {
+        "workingDays": 19,
+        "absences": 0,
+        "rights": 19,
+        "ticketsGiven": 19,
+        "difference": 0
+      },
+      "2025-12": {
+        "workingDays": 22,
+        "absences": 4,
+        "rights": 18,
+        "ticketsGiven": 22,
+        "difference": -4
+      },
+      "2026-01": {
+        "workingDays": 21,
+        "absences": 3,
+        "rights": 18,
+        "ticketsGiven": 17,
+        "difference": 1
+      },
+      "2026-02": {
+        "workingDays": 20,
+        "absences": 4,
+        "rights": 16,
+        "ticketsGiven": 17,
+        "difference": -1
+      },
+      "2026-03": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 18,
+        "difference": 4
+      },
+      "2026-04": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      },
+      "2026-05": {
+        "workingDays": 18,
+        "absences": 1,
+        "rights": 17,
+        "ticketsGiven": 18,
+        "difference": -1
+      },
+      "2026-06": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 21,
+        "difference": 1
+      },
+      "2026-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-08": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      }
+    },
+    "ERRIGO Nathalie": {
+      "2025-06": {
+        "workingDays": 20,
+        "absences": 9,
+        "rights": 11,
+        "ticketsGiven": 21,
+        "difference": -10
+      },
+      "2025-07": {
+        "workingDays": 22,
+        "absences": 1,
+        "rights": 21,
+        "ticketsGiven": 12,
+        "difference": 9
+      },
+      "2025-08": {
+        "workingDays": 20,
+        "absences": 15,
+        "rights": 5,
+        "ticketsGiven": 20,
+        "difference": -15
+      },
+      "2025-09": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 5,
+        "difference": 17
+      },
+      "2025-10": {
+        "workingDays": 23,
+        "absences": 0,
+        "rights": 23,
+        "ticketsGiven": 24,
+        "difference": -1
+      },
+      "2025-11": {
+        "workingDays": 19,
+        "absences": 4,
+        "rights": 15,
+        "ticketsGiven": 19,
+        "difference": -4
+      },
+      "2025-12": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 18,
+        "difference": 4
+      },
+      "2026-01": {
+        "workingDays": 21,
+        "absences": 1,
+        "rights": 20,
+        "ticketsGiven": 21,
+        "difference": -1
+      },
+      "2026-02": {
+        "workingDays": 20,
+        "absences": 1,
+        "rights": 19,
+        "ticketsGiven": 19,
+        "difference": 0
+      },
+      "2026-03": {
+        "workingDays": 22,
+        "absences": 1,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      },
+      "2026-04": {
+        "workingDays": 21,
+        "absences": 5,
+        "rights": 16,
+        "ticketsGiven": 20,
+        "difference": -4
+      },
+      "2026-05": {
+        "workingDays": 18,
+        "absences": 11,
+        "rights": 7,
+        "ticketsGiven": 13,
+        "difference": -6
+      },
+      "2026-06": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 11,
+        "difference": 11
+      },
+      "2026-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-08": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      }
+    },
+    "VAZ DA SILVA Bernadette": {
+      "2025-09": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 6,
+        "difference": 16
+      },
+      "2025-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2025-08": {
+        "workingDays": 20,
+        "absences": 14,
+        "rights": 6,
+        "ticketsGiven": 21,
+        "difference": -15
+      },
+      "2025-06": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 21,
+        "difference": -1
+      },
+      "2025-10": {
+        "workingDays": 23,
+        "absences": 0,
+        "rights": 23,
+        "ticketsGiven": 23,
+        "difference": 0
+      },
+      "2025-11": {
+        "workingDays": 19,
+        "absences": 0,
+        "rights": 19,
+        "ticketsGiven": 19,
+        "difference": 0
+      },
+      "2025-12": {
+        "workingDays": 22,
+        "absences": 2,
+        "rights": 20,
+        "ticketsGiven": 22,
+        "difference": -2
+      },
+      "2026-01": {
+        "workingDays": 21,
+        "absences": 1,
+        "rights": 20,
+        "ticketsGiven": 19,
+        "difference": 1
+      },
+      "2026-02": {
+        "workingDays": 20,
+        "absences": 2,
+        "rights": 18,
+        "ticketsGiven": 19,
+        "difference": -1
+      },
+      "2026-03": {
+        "workingDays": 22,
+        "absences": 3,
+        "rights": 19,
+        "ticketsGiven": 21,
+        "difference": -2
+      },
+      "2026-04": {
+        "workingDays": 21,
+        "absences": 1,
+        "rights": 20,
+        "ticketsGiven": 17,
+        "difference": 3
+      },
+      "2026-05": {
+        "workingDays": 18,
+        "absences": 4,
+        "rights": 14,
+        "ticketsGiven": 17,
+        "difference": -3
+      },
+      "2026-06": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 18,
+        "difference": 4
+      },
+      "2026-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-08": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      }
+    },
+    "FAFOURNAUX Guilaine": {
+      "2025-06": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 21,
+        "difference": -1
+      },
+      "2025-07": {
+        "workingDays": 22,
+        "absences": 5,
+        "rights": 17,
+        "ticketsGiven": 22,
+        "difference": -5
+      },
+      "2025-08": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 16,
+        "difference": 4
+      },
+      "2025-09": {
+        "workingDays": 22,
+        "absences": 10,
+        "rights": 12,
+        "ticketsGiven": 20,
+        "difference": -8
+      },
+      "2025-10": {
+        "workingDays": 23,
+        "absences": 1,
+        "rights": 22,
+        "ticketsGiven": 13,
+        "difference": 9
+      },
+      "2025-11": {
+        "workingDays": 19,
+        "absences": 0,
+        "rights": 19,
+        "ticketsGiven": 18,
+        "difference": 1
+      },
+      "2025-12": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-01": {
+        "workingDays": 21,
+        "absences": 5,
+        "rights": 16,
+        "ticketsGiven": 21,
+        "difference": -5
+      },
+      "2026-02": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 15,
+        "difference": 5
+      },
+      "2026-03": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-04": {
+        "workingDays": 21,
+        "absences": 5,
+        "rights": 16,
+        "ticketsGiven": 21,
+        "difference": -5
+      },
+      "2026-05": {
+        "workingDays": 18,
+        "absences": 1,
+        "rights": 17,
+        "ticketsGiven": 13,
+        "difference": 4
+      },
+      "2026-06": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 21,
+        "difference": 1
+      },
+      "2026-07": {
+        "workingDays": 22,
+        "absences": 6,
+        "rights": 16,
+        "ticketsGiven": 22,
+        "difference": -6
+      },
+      "2026-08": {
+        "workingDays": 16,
+        "absences": 0,
+        "rights": 16,
+        "ticketsGiven": 11,
+        "difference": 5
+      }
+    },
+    "PRABEL Hervé": {
+      "2025-06": {
+        "workingDays": 20,
+        "absences": 10,
+        "rights": 10,
+        "ticketsGiven": 21,
+        "difference": -11
+      },
+      "2025-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 12,
+        "difference": 10
+      },
+      "2025-08": {
+        "workingDays": 20,
+        "absences": 1,
+        "rights": 19,
+        "ticketsGiven": 21,
+        "difference": -2
+      },
+      "2025-09": {
+        "workingDays": 22,
+        "absences": 5,
+        "rights": 17,
+        "ticketsGiven": 19,
+        "difference": -2
+      },
+      "2025-10": {
+        "workingDays": 23,
+        "absences": 1,
+        "rights": 22,
+        "ticketsGiven": 18,
+        "difference": 4
+      },
+      "2025-11": {
+        "workingDays": 19,
+        "absences": 1,
+        "rights": 18,
+        "ticketsGiven": 18,
+        "difference": 0
+      },
+      "2025-12": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 21,
+        "difference": 1
+      },
+      "2026-01": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      },
+      "2026-02": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 20,
+        "difference": 0
+      },
+      "2026-03": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-04": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      },
+      "2026-05": {
+        "workingDays": 18,
+        "absences": 0,
+        "rights": 18,
+        "ticketsGiven": 18,
+        "difference": 0
+      },
+      "2026-06": {
+        "workingDays": 22,
+        "absences": 10,
+        "rights": 12,
+        "ticketsGiven": 22,
+        "difference": -10
+      },
+      "2026-07": {
+        "workingDays": 22,
+        "absences": 5,
+        "rights": 17,
+        "ticketsGiven": 12,
+        "difference": 5
+      },
+      "2026-08": {
+        "workingDays": 17,
+        "absences": 0,
+        "rights": 17,
+        "ticketsGiven": 11,
+        "difference": 6
+      }
+    },
+    "COLLIGNON Deborah": {
+      "2025-06": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 21,
+        "difference": -1
+      },
+      "2025-07": {
+        "workingDays": 22,
+        "absences": 8,
+        "rights": 14,
+        "ticketsGiven": 22,
+        "difference": -8
+      },
+      "2025-08": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 13,
+        "difference": 7
+      },
+      "2025-09": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 20,
+        "difference": 2
+      },
+      "2025-10": {
+        "workingDays": 23,
+        "absences": 0,
+        "rights": 23,
+        "ticketsGiven": 23,
+        "difference": 0
+      },
+      "2025-11": {
+        "workingDays": 19,
+        "absences": 0,
+        "rights": 19,
+        "ticketsGiven": 19,
+        "difference": 0
+      },
+      "2025-12": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-01": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      },
+      "2026-02": {
+        "workingDays": 20,
+        "absences": 0,
+        "rights": 20,
+        "ticketsGiven": 20,
+        "difference": 0
+      },
+      "2026-03": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 22,
+        "difference": 0
+      },
+      "2026-04": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      },
+      "2026-05": {
+        "workingDays": 18,
+        "absences": 0,
+        "rights": 18,
+        "ticketsGiven": 18,
+        "difference": 0
+      },
+      "2026-06": {
+        "workingDays": 22,
+        "absences": 5,
+        "rights": 17,
+        "ticketsGiven": 22,
+        "difference": -5
+      },
+      "2026-07": {
+        "workingDays": 22,
+        "absences": 0,
+        "rights": 22,
+        "ticketsGiven": 17,
+        "difference": 5
+      },
+      "2026-08": {
+        "workingDays": 21,
+        "absences": 0,
+        "rights": 21,
+        "ticketsGiven": 21,
+        "difference": 0
+      }
+    },
+    "GUIGUET Sandrine": {
+      "2025-06": {
+        "workingDays": 8,
+        "absences": 0,
+        "rights": 8,
+        "ticketsGiven": 8,
+        "difference": 0
+      },
+      "2025-07": {
+        "workingDays": 10,
+        "absences": 6,
+        "rights": 4,
+        "ticketsGiven": 10,
+        "difference": -6
+      },
+      "2025-08": {
+        "workingDays": 8,
+        "absences": 6,
+        "rights": 2,
+        "ticketsGiven": 2,
+        "difference": 0
+      },
+      "2025-09": {
+        "workingDays": 9,
+        "absences": 0,
+        "rights": 9,
+        "ticketsGiven": 3,
+        "difference": 6
+      },
+      "2025-10": {
+        "workingDays": 8,
+        "absences": 6,
+        "rights": 2,
+        "ticketsGiven": 8,
+        "difference": -6
+      },
+      "2025-11": {
+        "workingDays": 7,
+        "absences": 1,
+        "rights": 6,
+        "ticketsGiven": 1,
+        "difference": 5
+      },
+      "2025-12": {
+        "workingDays": 10,
+        "absences": 4,
+        "rights": 6,
+        "ticketsGiven": 9,
+        "difference": -3
+      },
+      "2026-01": {
+        "workingDays": 8,
+        "absences": 1,
+        "rights": 7,
+        "ticketsGiven": 4,
+        "difference": 3
+      },
+      "2026-02": {
+        "workingDays": 8,
+        "absences": 2,
+        "rights": 6,
+        "ticketsGiven": 7,
+        "difference": -1
+      },
+      "2026-03": {
+        "workingDays": 9,
+        "absences": 1,
+        "rights": 8,
+        "ticketsGiven": 7,
+        "difference": 1
+      },
+      "2026-04": {
+        "workingDays": 9,
+        "absences": 2,
+        "rights": 7,
+        "ticketsGiven": 8,
+        "difference": -1
+      },
+      "2026-05": {
+        "workingDays": 8,
+        "absences": 5,
+        "rights": 3,
+        "ticketsGiven": 6,
+        "difference": -3
+      },
+      "2026-06": {
+        "workingDays": 9,
+        "absences": 0,
+        "rights": 9,
+        "ticketsGiven": 4,
+        "difference": 5
+      },
+      "2026-07": {
+        "workingDays": 8,
+        "absences": 5,
+        "rights": 3,
+        "ticketsGiven": 8,
+        "difference": -5
+      },
+      "2026-08": {
+        "workingDays": 8,
+        "absences": 0,
+        "rights": 8,
+        "ticketsGiven": 3,
+        "difference": 5
+      }
+    }
+  },
+  "exportDate": "2026-08-07T01:36:37.515Z",
+  "year": 2026
+}

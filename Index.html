@@ -19,47 +19,12 @@
           <h2>Période et contrôles</h2>
           <div class="controls-row">
             <div class="form-group">
-              <label for="referenceYear">Année</label>
-              <select id="referenceYear" onchange="updateYearAndData()">
-                <option value="2023">2023</option>
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026" selected>2026</option>
-              </select>
+              <label for="startDate">Date de début</label>
+              <input type="date" id="startDate" onchange="updateData()" />
             </div>
             <div class="form-group">
-              <label for="startMonth">Mois de début</label>
-              <select id="startMonth" onchange="updateData()">
-                <option value="1">Janvier</option>
-                <option value="2">Février</option>
-                <option value="3">Mars</option>
-                <option value="4">Avril</option>
-                <option value="5">Mai</option>
-                <option value="6">Juin</option>
-                <option value="7">Juillet</option>
-                <option value="8">Août</option>
-                <option value="9">Septembre</option>
-                <option value="10">Octobre</option>
-                <option value="11">Novembre</option>
-                <option value="12">Décembre</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="endMonth">Mois de fin</label>
-              <select id="endMonth" onchange="updateData()">
-                <option value="1">Janvier</option>
-                <option value="2">Février</option>
-                <option value="3">Mars</option>
-                <option value="4">Avril</option>
-                <option value="5">Mai</option>
-                <option value="6">Juin</option>
-                <option value="7">Juillet</option>
-                <option value="8">Août</option>
-                <option value="9">Septembre</option>
-                <option value="10">Octobre</option>
-                <option value="11">Novembre</option>
-                <option value="12" selected>Décembre</option>
-              </select>
+              <label for="endDate">Date de fin</label>
+              <input type="date" id="endDate" onchange="updateData()" />
             </div>
             <div class="form-group">
               <label for="newEmployeeName">Ajouter salarié</label>
@@ -265,6 +230,74 @@
       let currentYear = new Date().getFullYear();
       let currentEmployee = null;
 
+      function toNumber(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function normalizeEmployeeData(rawEmployees) {
+        if (!rawEmployees || typeof rawEmployees !== "object") return {};
+
+        const normalized = {};
+
+        Object.keys(rawEmployees).forEach((employeeName) => {
+          const employeeMonths = rawEmployees[employeeName];
+          normalized[employeeName] = {};
+
+          if (!employeeMonths || typeof employeeMonths !== "object") return;
+
+          Object.keys(employeeMonths).forEach((monthKey) => {
+            const data = employeeMonths[monthKey] || {};
+            const workingDays = toNumber(data.workingDays);
+            const absences = toNumber(data.absences);
+            const rights = toNumber(data.rights);
+            const ticketsGiven = toNumber(data.ticketsGiven);
+            const difference =
+              data.difference !== undefined
+                ? toNumber(data.difference)
+                : rights - ticketsGiven;
+
+            normalized[employeeName][monthKey] = {
+              workingDays,
+              absences,
+              rights,
+              ticketsGiven,
+              difference,
+            };
+          });
+        });
+
+        return normalized;
+      }
+
+      function getPeriodBoundsFromEmployees(rawEmployees) {
+        if (!rawEmployees || typeof rawEmployees !== "object") return null;
+
+        const monthKeys = [];
+        Object.values(rawEmployees).forEach((employeeMonths) => {
+          if (!employeeMonths || typeof employeeMonths !== "object") return;
+          Object.keys(employeeMonths).forEach((monthKey) => {
+            if (/^\d{4}-\d{2}$/.test(monthKey)) {
+              monthKeys.push(monthKey);
+            }
+          });
+        });
+
+        if (monthKeys.length === 0) return null;
+
+        monthKeys.sort();
+        const firstKey = monthKeys[0];
+        const lastKey = monthKeys[monthKeys.length - 1];
+        const [startYear, startMonth] = firstKey.split("-").map(Number);
+        const [endYear, endMonth] = lastKey.split("-").map(Number);
+        const lastDay = new Date(endYear, endMonth, 0).getDate();
+
+        return {
+          startDate: `${startYear}-${String(startMonth).padStart(2, "0")}-01`,
+          endDate: `${endYear}-${String(endMonth).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`,
+        };
+      }
+
       // Fonction de stockage local
       function saveToStorage() {
         try {
@@ -273,6 +306,14 @@
             JSON.stringify(employees),
           );
           localStorage.setItem("ticketRestaurantYear", currentYear.toString());
+          localStorage.setItem(
+            "ticketRestaurantStartDate",
+            document.getElementById("startDate").value,
+          );
+          localStorage.setItem(
+            "ticketRestaurantEndDate",
+            document.getElementById("endDate").value,
+          );
         } catch (e) {
           console.warn("Impossible de sauvegarder dans localStorage:", e);
         }
@@ -282,12 +323,28 @@
         try {
           const data = localStorage.getItem("ticketRestaurantData");
           const year = localStorage.getItem("ticketRestaurantYear");
+          const startDate = localStorage.getItem("ticketRestaurantStartDate");
+          const endDate = localStorage.getItem("ticketRestaurantEndDate");
           if (data) {
-            employees = JSON.parse(data);
+            employees = normalizeEmployeeData(JSON.parse(data));
           }
           if (year) {
             currentYear = parseInt(year);
-            document.getElementById("referenceYear").value = currentYear;
+          }
+          if (startDate) {
+            document.getElementById("startDate").value = startDate;
+          }
+          if (endDate) {
+            document.getElementById("endDate").value = endDate;
+          }
+          if (!startDate || !endDate) {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            document.getElementById("startDate").value =
+              `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`;
+            document.getElementById("endDate").value =
+              `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, "0")}-${String(end.getDate()).padStart(2, "0")}`;
           }
         } catch (e) {
           console.warn("Impossible de charger depuis localStorage:", e);
@@ -324,41 +381,40 @@
         return totalDays;
       }
 
-      // Nouvelle fonction pour obtenir la liste des mois dans une période personnalisée
-      function getMonthsInCustomPeriod(startMonth, endMonth) {
-        const months = [];
-        let current = parseInt(startMonth);
-        const end = parseInt(endMonth);
+      function getPeriodMonthKeys(startDate, endDate) {
+        const keys = [];
+        const start = new Date(`${startDate}T00:00:00`);
+        const end = new Date(`${endDate}T00:00:00`);
+        const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+        const last = new Date(end.getFullYear(), end.getMonth(), 1);
 
-        if (current <= end) {
-          // Période dans la même année
-          for (let i = current; i <= end; i++) {
-            months.push(i);
-          }
-        } else {
-          // Période qui traverse deux années (ex: oct à mars)
-          for (let i = current; i <= 12; i++) {
-            months.push(i);
-          }
-          for (let i = 1; i <= end; i++) {
-            months.push(i);
-          }
+        while (cursor <= last) {
+          keys.push(
+            `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`,
+          );
+          cursor.setMonth(cursor.getMonth() + 1);
         }
-        return months;
+
+        return keys;
       }
 
-      function getPeriodWorkingDays(year, startMonth, endMonth) {
-        const months = getMonthsInCustomPeriod(startMonth, endMonth);
-        return months.reduce(
-          (total, month) => total + getWorkingDaysInMonth(year, month),
-          0,
-        );
+      function getPeriodWorkingDays(startDate, endDate) {
+        return getPeriodMonthKeys(startDate, endDate).reduce((total, key) => {
+          const [year, month] = key.split("-").map(Number);
+          return total + getWorkingDaysInMonth(year, month);
+        }, 0);
       }
 
       // Fonction pour définir des raccourcis de période
-      function setPeriod(start, end) {
-        document.getElementById("startMonth").value = start;
-        document.getElementById("endMonth").value = end;
+      function setPeriod(startMonth, endMonth) {
+        const baseYear = parseInt(
+          document.getElementById("startDate").value.split("-")[0] ||
+            currentYear,
+        );
+        const startDate = `${baseYear}-${String(startMonth).padStart(2, "0")}-01`;
+        const endDate = `${baseYear}-${String(endMonth).padStart(2, "0")}-${new Date(baseYear, endMonth, 0).getDate()}`;
+        document.getElementById("startDate").value = startDate;
+        document.getElementById("endDate").value = endDate;
         updateData();
       }
 
@@ -418,14 +474,17 @@
         const [year, month] = monthValue.split("-").map(Number);
         const monthData = employees[currentEmployee][monthValue];
         if (monthData) {
+          const normalizedWorkingDays = toNumber(monthData.workingDays);
           document.getElementById("quickWorkingDays").value =
-            typeof monthData.workingDays === "number"
-              ? monthData.workingDays
+            normalizedWorkingDays > 0
+              ? normalizedWorkingDays
               : getWorkingDaysInMonth(year, month);
-          document.getElementById("quickAbsences").value =
-            monthData.absences || 0;
-          document.getElementById("quickGiven").value =
-            monthData.ticketsGiven || 0;
+          document.getElementById("quickAbsences").value = toNumber(
+            monthData.absences,
+          );
+          document.getElementById("quickGiven").value = toNumber(
+            monthData.ticketsGiven,
+          );
         } else {
           document.getElementById("quickWorkingDays").value =
             getWorkingDaysInMonth(year, month);
@@ -435,30 +494,32 @@
 
         calculateQuickRights();
 
-        // Calcul du solde total sur la période sélectionnée (toutes années)
-        const startMonth = parseInt(
-          document.getElementById("startMonth").value,
-        );
-        const endMonth = parseInt(document.getElementById("endMonth").value);
-        const months = getMonthsInCustomPeriod(startMonth, endMonth);
+        // Calcul du solde total sur la période sélectionnée
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const periodKeys = getPeriodMonthKeys(startDate, endDate);
 
         let empRights = 0,
-          empGiven = 0;
+          empGiven = 0,
+          empDifference = 0;
 
         // Itérer sur tous les mois/années de l'employé
         if (employees[currentEmployee]) {
           Object.keys(employees[currentEmployee]).forEach((key) => {
-            const monthNum = parseInt(key.split("-")[1]);
-            if (months.includes(monthNum)) {
+            if (periodKeys.includes(key)) {
               const data = employees[currentEmployee][key];
               if (data) {
                 empRights += data.rights || 0;
                 empGiven += data.ticketsGiven || 0;
+                empDifference +=
+                  data.difference !== undefined
+                    ? toNumber(data.difference)
+                    : toNumber(data.rights) - toNumber(data.ticketsGiven);
               }
             }
           });
         }
-        const totalBalance = empRights - empGiven;
+        const totalBalance = empDifference;
         document.getElementById("quickTotalBalance").textContent =
           (totalBalance > 0 ? "+" : "") + totalBalance;
       }
@@ -478,26 +539,28 @@
         // document.getElementById("quickBalance").textContent =
         //   (balance > 0 ? "+" : "") + balance;
 
-        // Mettre à jour le solde total sur la période (toutes années)
+        // Mettre à jour le solde total sur la période
         if (!currentEmployee) return;
-        const startMonth = parseInt(
-          document.getElementById("startMonth").value,
-        );
-        const endMonth = parseInt(document.getElementById("endMonth").value);
-        const months = getMonthsInCustomPeriod(startMonth, endMonth);
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const periodKeys = getPeriodMonthKeys(startDate, endDate);
 
         let empRights = 0,
-          empGiven = 0;
+          empGiven = 0,
+          empDifference = 0;
 
         // Itérer sur tous les mois/années de l'employé
         if (employees[currentEmployee]) {
           Object.keys(employees[currentEmployee]).forEach((key) => {
-            const monthNum = parseInt(key.split("-")[1]);
-            if (months.includes(monthNum)) {
+            if (periodKeys.includes(key)) {
               const data = employees[currentEmployee][key];
               if (data) {
                 empRights += data.rights || 0;
                 empGiven += data.ticketsGiven || 0;
+                empDifference +=
+                  data.difference !== undefined
+                    ? toNumber(data.difference)
+                    : toNumber(data.rights) - toNumber(data.ticketsGiven);
               }
             }
           });
@@ -505,7 +568,7 @@
 
         // Ajoute les valeurs en cours de saisie si le mois affiché n'est pas encore enregistré
         const quickMonth = document.getElementById("quickMonth").value;
-        if (months.includes(parseInt(quickMonth.split("-")[1]))) {
+        if (periodKeys.includes(quickMonth)) {
           const currentData = employees[currentEmployee][quickMonth];
           const currentRights = rights;
           const currentGiven = ticketsGiven;
@@ -518,13 +581,19 @@
             if (currentData) {
               empRights -= currentData.rights || 0;
               empGiven -= currentData.ticketsGiven || 0;
+              empDifference -=
+                currentData.difference !== undefined
+                  ? toNumber(currentData.difference)
+                  : toNumber(currentData.rights) -
+                    toNumber(currentData.ticketsGiven);
             }
             empRights += currentRights;
             empGiven += currentGiven;
+            empDifference += currentRights - currentGiven;
           }
         }
 
-        const totalBalance = empRights - empGiven;
+        const totalBalance = empDifference;
         document.getElementById("quickTotalBalance").textContent =
           (totalBalance > 0 ? "+" : "") + totalBalance;
       }
@@ -586,10 +655,29 @@
           try {
             const data = JSON.parse(e.target.result);
             if (data.employees) {
-              employees = data.employees;
+              employees = normalizeEmployeeData(data.employees);
+
+              const importedBounds = getPeriodBoundsFromEmployees(
+                data.employees,
+              );
+              if (importedBounds) {
+                document.getElementById("startDate").value =
+                  importedBounds.startDate;
+                document.getElementById("endDate").value =
+                  importedBounds.endDate;
+              }
+
               if (data.year) {
                 currentYear = data.year;
-                document.getElementById("referenceYear").value = currentYear;
+                // Compatibilite avec les anciens exports qui ne contiennent pas de plage de dates.
+                if (!document.getElementById("startDate").value) {
+                  document.getElementById("startDate").value =
+                    `${currentYear}-01-01`;
+                }
+                if (!document.getElementById("endDate").value) {
+                  document.getElementById("endDate").value =
+                    `${currentYear}-12-31`;
+                }
               }
               saveToStorage();
               updateData();
@@ -602,6 +690,7 @@
           }
         };
         reader.readAsText(file);
+        document.getElementById("importFile").value = "";
       }
 
       function clearAllData() {
@@ -616,30 +705,20 @@
         }
       }
 
-      // Fonction pour mettre à jour l'année ET les données
-      function updateYearAndData() {
-        currentYear = parseInt(document.getElementById("referenceYear").value);
-        updateData();
-      }
-
       // Mise à jour de l'affichage
       function updateData() {
-        const startMonth = parseInt(
-          document.getElementById("startMonth").value,
-        );
-        const endMonth = parseInt(document.getElementById("endMonth").value);
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
 
-        // Validation de la période
-        if (startMonth > endMonth) {
-          // Si le mois de début est supérieur au mois de fin, on assume que c'est une période qui traverse l'année
-          // Ex: Octobre (10) à Mars (3) de l'année suivante
+        if (startDate && endDate) {
+          currentYear = parseInt(startDate.split("-")[0]);
         }
 
         // Mettre à jour les informations de période
-        updatePeriodInfo(startMonth, endMonth);
+        updatePeriodInfo(startDate, endDate);
 
         // Mettre à jour le tableau
-        updateSummaryTable(startMonth, endMonth);
+        updateSummaryTable(startDate, endDate);
 
         saveToStorage();
       }
@@ -662,29 +741,25 @@
         return monthNames[monthNum - 1];
       }
 
-      function updatePeriodInfo(startMonth, endMonth) {
-        const startName = getMonthName(startMonth);
-        const endName = getMonthName(endMonth);
+      function formatDateForDisplay(dateValue) {
+        if (!dateValue) return "";
+        const [year, month, day] = dateValue.split("-").map(Number);
+        return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+      }
 
-        let periodText;
-        if (startMonth === endMonth) {
-          periodText = `${startName} ${currentYear}`;
-        } else {
-          periodText = `${startName} - ${endName} ${currentYear}`;
-        }
+      function updatePeriodInfo(startDate, endDate) {
+        const startLabel = formatDateForDisplay(startDate);
+        const endLabel = formatDateForDisplay(endDate);
 
+        const periodText = `Du ${startLabel} au ${endLabel}`;
         document.getElementById("selectedPeriodText").textContent = periodText;
 
-        const workingDays = getPeriodWorkingDays(
-          currentYear,
-          startMonth,
-          endMonth,
-        );
+        const workingDays = getPeriodWorkingDays(startDate, endDate);
         document.getElementById("periodWorkingDays").textContent =
           workingDays + " jours";
       }
 
-      function updateSummaryTable(startMonth, endMonth) {
+      function updateSummaryTable(startDate, endDate) {
         const container = document.getElementById("summaryContainer");
         const totalsRow = document.getElementById("tableTotals");
 
@@ -697,11 +772,12 @@
           return;
         }
 
-        const months = getMonthsInCustomPeriod(startMonth, endMonth);
+        const periodKeys = getPeriodMonthKeys(startDate, endDate);
         let totalWorking = 0,
           totalAbsences = 0,
           totalRights = 0,
-          totalGiven = 0;
+          totalGiven = 0,
+          totalBalance = 0;
 
         const rows = employeeNames
           .map((name) => {
@@ -709,23 +785,28 @@
             let empWorking = 0,
               empAbsences = 0,
               empRights = 0,
-              empGiven = 0;
+              empGiven = 0,
+              empDifference = 0;
 
             // Itérer sur toutes les entrées de l'employé pour cumuler les années
             Object.keys(employeeData).forEach((monthKey) => {
-              const monthNum = parseInt(monthKey.split("-")[1]);
-              if (months.includes(monthNum)) {
+              if (periodKeys.includes(monthKey)) {
                 const monthData = employeeData[monthKey];
                 if (monthData) {
-                  empWorking += monthData.workingDays || 0;
-                  empAbsences += monthData.absences || 0;
-                  empRights += monthData.rights || 0;
-                  empGiven += monthData.ticketsGiven || 0;
+                  empWorking += toNumber(monthData.workingDays);
+                  empAbsences += toNumber(monthData.absences);
+                  empRights += toNumber(monthData.rights);
+                  empGiven += toNumber(monthData.ticketsGiven);
+                  empDifference +=
+                    monthData.difference !== undefined
+                      ? toNumber(monthData.difference)
+                      : toNumber(monthData.rights) -
+                        toNumber(monthData.ticketsGiven);
                 }
               }
             });
 
-            const balance = empRights - empGiven;
+            const balance = empDifference;
             const balanceClass =
               balance > 0
                 ? "status-positive"
@@ -739,6 +820,7 @@
             totalAbsences += empAbsences;
             totalRights += empRights;
             totalGiven += empGiven;
+            totalBalance += balance;
 
             return `
             <div class="table-row">
@@ -760,7 +842,6 @@
         container.innerHTML = rows;
 
         // Mise à jour des totaux
-        const totalBalance = totalRights - totalGiven;
         const totalBalanceClass =
           totalBalance > 0
             ? "status-positive"
