@@ -669,17 +669,11 @@
         applyWorkingWeekdaysToForm(settings.workingWeekdays);
         refreshWorkPatternHint();
 
-        // Positionner la periode globale sur le mois courant.
+        // Definir le mois courant par defaut dans la saisie rapide
+        // sans modifier les filtres de periode principaux.
         const now = new Date();
         const currentYearValue = now.getFullYear();
         const currentMonthValue = now.getMonth() + 1;
-        const monthStart = `${currentYearValue}-${String(currentMonthValue).padStart(2, "0")}-01`;
-        const monthEnd = `${currentYearValue}-${String(currentMonthValue).padStart(2, "0")}-${String(new Date(currentYearValue, currentMonthValue, 0).getDate()).padStart(2, "0")}`;
-        document.getElementById("startDate").value = monthStart;
-        document.getElementById("endDate").value = monthEnd;
-        updateData();
-
-        // Definir le mois courant par defaut dans la saisie rapide.
         const currentMonth =
           currentYearValue + "-" + String(currentMonthValue).padStart(2, "0");
         document.getElementById("quickMonth").value = currentMonth;
