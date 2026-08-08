@@ -168,6 +168,63 @@
                     onchange="loadQuickMonthData()"
                   />
                 </div>
+                <div class="form-group">
+                  <label>Jours travailles (base)</label>
+                  <div class="weekday-grid">
+                    <label class="weekday-item"
+                      ><input
+                        type="checkbox"
+                        id="workday1"
+                        onchange="handleWorkPatternChange()"
+                        checked
+                      />Lun</label
+                    >
+                    <label class="weekday-item"
+                      ><input
+                        type="checkbox"
+                        id="workday2"
+                        onchange="handleWorkPatternChange()"
+                        checked
+                      />Mar</label
+                    >
+                    <label class="weekday-item"
+                      ><input
+                        type="checkbox"
+                        id="workday3"
+                        onchange="handleWorkPatternChange()"
+                        checked
+                      />Mer</label
+                    >
+                    <label class="weekday-item"
+                      ><input
+                        type="checkbox"
+                        id="workday4"
+                        onchange="handleWorkPatternChange()"
+                        checked
+                      />Jeu</label
+                    >
+                    <label class="weekday-item"
+                      ><input
+                        type="checkbox"
+                        id="workday5"
+                        onchange="handleWorkPatternChange()"
+                        checked
+                      />Ven</label
+                    >
+                  </div>
+                  <div class="work-pattern-meta">
+                    <small id="workPatternHint" class="work-pattern-hint"
+                      >Planning hebdomadaire non defini.</small
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-link"
+                      onclick="resetWorkPattern()"
+                    >
+                      Reinitialiser
+                    </button>
+                  </div>
+                </div>
                 <div class="form-row">
                   <div class="form-group">
                     <label for="quickWorkingDays">Jours Ouvrés</label>
@@ -230,6 +287,141 @@
       let currentYear = new Date().getFullYear();
       let currentEmployee = null;
 
+      function isMonthKey(key) {
+        return /^\d{4}-\d{2}$/.test(key);
+      }
+
+      function getDefaultWorkingWeekdays() {
+        return {
+          1: true,
+          2: true,
+          3: true,
+          4: true,
+          5: true,
+        };
+      }
+
+      function normalizeWorkingWeekdays(raw) {
+        const defaults = getDefaultWorkingWeekdays();
+        if (!raw || typeof raw !== "object") return defaults;
+
+        const normalized = { ...defaults };
+        for (let i = 1; i <= 5; i++) {
+          if (raw[i] !== undefined) {
+            normalized[i] = Boolean(raw[i]);
+          }
+        }
+
+        return normalized;
+      }
+
+      function getEmployeeSettings(employeeName) {
+        if (
+          !employees[employeeName] ||
+          typeof employees[employeeName] !== "object"
+        ) {
+          employees[employeeName] = {};
+        }
+
+        const rawSettings = employees[employeeName].__settings || {};
+        const normalizedSettings = {
+          workingWeekdays: normalizeWorkingWeekdays(
+            rawSettings.workingWeekdays,
+          ),
+          planningConfigured: Boolean(rawSettings.planningConfigured),
+        };
+
+        employees[employeeName].__settings = normalizedSettings;
+        return normalizedSettings;
+      }
+
+      function applyWorkingWeekdaysToForm(weekdays) {
+        const normalized = normalizeWorkingWeekdays(weekdays);
+        for (let i = 1; i <= 5; i++) {
+          const checkbox = document.getElementById(`workday${i}`);
+          if (checkbox) checkbox.checked = normalized[i];
+        }
+      }
+
+      function getWeekdayLabel(dayOfWeek) {
+        const labels = {
+          1: "lun",
+          2: "mar",
+          3: "mer",
+          4: "jeu",
+          5: "ven",
+        };
+        return labels[dayOfWeek] || "";
+      }
+
+      function getWorkingWeekdaysSummary(weekdays) {
+        const normalized = normalizeWorkingWeekdays(weekdays);
+        const selected = [];
+        for (let i = 1; i <= 5; i++) {
+          if (normalized[i]) selected.push(getWeekdayLabel(i));
+        }
+        return selected.length > 0 ? selected.join(", ") : "aucun jour";
+      }
+
+      function refreshWorkPatternHint() {
+        const hint = document.getElementById("workPatternHint");
+        if (!hint || !currentEmployee) return;
+
+        const settings = getEmployeeSettings(currentEmployee);
+        if (settings.planningConfigured) {
+          hint.textContent =
+            "Planning memorise pour ce salarie : " +
+            getWorkingWeekdaysSummary(settings.workingWeekdays);
+        } else {
+          hint.textContent =
+            "Choisis les jours une seule fois : ils seront reutilises automatiquement tous les mois.";
+        }
+      }
+
+      function readWorkingWeekdaysFromForm() {
+        const weekdays = {};
+        for (let i = 1; i <= 5; i++) {
+          const checkbox = document.getElementById(`workday${i}`);
+          weekdays[i] = checkbox ? checkbox.checked : true;
+        }
+        return weekdays;
+      }
+
+      function handleWorkPatternChange() {
+        if (!currentEmployee) return;
+
+        const settings = getEmployeeSettings(currentEmployee);
+        settings.workingWeekdays = normalizeWorkingWeekdays(
+          readWorkingWeekdaysFromForm(),
+        );
+        settings.planningConfigured = true;
+
+        const monthValue = document.getElementById("quickMonth").value;
+        const monthData = employees[currentEmployee][monthValue];
+        if (!monthData && monthValue) {
+          const [year, month] = monthValue.split("-").map(Number);
+          document.getElementById("quickWorkingDays").value =
+            getWorkingDaysInMonth(year, month, settings.workingWeekdays);
+        }
+
+        calculateQuickRights();
+        refreshWorkPatternHint();
+        saveToStorage();
+      }
+
+      function resetWorkPattern() {
+        if (!currentEmployee) return;
+
+        const settings = getEmployeeSettings(currentEmployee);
+        settings.workingWeekdays = getDefaultWorkingWeekdays();
+        settings.planningConfigured = false;
+
+        applyWorkingWeekdaysToForm(settings.workingWeekdays);
+        loadQuickMonthData();
+        refreshWorkPatternHint();
+        saveToStorage();
+      }
+
       function toNumber(value) {
         const parsed = Number(value);
         return Number.isFinite(parsed) ? parsed : 0;
@@ -247,6 +439,21 @@
           if (!employeeMonths || typeof employeeMonths !== "object") return;
 
           Object.keys(employeeMonths).forEach((monthKey) => {
+            if (monthKey === "__settings") {
+              const settings = employeeMonths[monthKey] || {};
+              normalized[employeeName].__settings = {
+                workingWeekdays: normalizeWorkingWeekdays(
+                  settings.workingWeekdays,
+                ),
+                planningConfigured: Boolean(settings.planningConfigured),
+              };
+              return;
+            }
+
+            if (!isMonthKey(monthKey)) {
+              return;
+            }
+
             const data = employeeMonths[monthKey] || {};
             const workingDays = toNumber(data.workingDays);
             const absences = toNumber(data.absences);
@@ -277,7 +484,7 @@
         Object.values(rawEmployees).forEach((employeeMonths) => {
           if (!employeeMonths || typeof employeeMonths !== "object") return;
           Object.keys(employeeMonths).forEach((monthKey) => {
-            if (/^\d{4}-\d{2}$/.test(monthKey)) {
+            if (isMonthKey(monthKey)) {
               monthKeys.push(monthKey);
             }
           });
@@ -353,7 +560,8 @@
       }
 
       // Calculs de jours ouvrés
-      function getWorkingDaysInMonth(year, month) {
+      function getWorkingDaysInMonth(year, month, workingWeekdays = null) {
+        const activeWeekdays = normalizeWorkingWeekdays(workingWeekdays);
         const holidays = getFrenchHolidays(year);
         const date = new Date(year, month - 1, 1);
         let workingDays = 0;
@@ -365,7 +573,12 @@
             String(date.getDate()).padStart(2, "0"),
           ].join("-");
           // Jours ouvrés = lundi à vendredi, hors jours fériés
-          if (dayOfWeek >= 1 && dayOfWeek <= 5 && !holidays.includes(isoDate)) {
+          if (
+            dayOfWeek >= 1 &&
+            dayOfWeek <= 5 &&
+            activeWeekdays[dayOfWeek] &&
+            !holidays.includes(isoDate)
+          ) {
             workingDays++;
           }
           date.setDate(date.getDate() + 1);
@@ -452,10 +665,23 @@
         currentEmployee = employeeName;
         document.getElementById("modalEmployeeName").textContent = employeeName;
 
-        // Définir le mois actuel par défaut
+        const settings = getEmployeeSettings(employeeName);
+        applyWorkingWeekdaysToForm(settings.workingWeekdays);
+        refreshWorkPatternHint();
+
+        // Positionner la periode globale sur le mois courant.
         const now = new Date();
+        const currentYearValue = now.getFullYear();
+        const currentMonthValue = now.getMonth() + 1;
+        const monthStart = `${currentYearValue}-${String(currentMonthValue).padStart(2, "0")}-01`;
+        const monthEnd = `${currentYearValue}-${String(currentMonthValue).padStart(2, "0")}-${String(new Date(currentYearValue, currentMonthValue, 0).getDate()).padStart(2, "0")}`;
+        document.getElementById("startDate").value = monthStart;
+        document.getElementById("endDate").value = monthEnd;
+        updateData();
+
+        // Definir le mois courant par defaut dans la saisie rapide.
         const currentMonth =
-          currentYear + "-" + String(now.getMonth() + 1).padStart(2, "0");
+          currentYearValue + "-" + String(currentMonthValue).padStart(2, "0");
         document.getElementById("quickMonth").value = currentMonth;
 
         loadQuickMonthData();
@@ -472,13 +698,16 @@
         if (!monthValue || !currentEmployee) return;
 
         const [year, month] = monthValue.split("-").map(Number);
+        const settings = getEmployeeSettings(currentEmployee);
+        applyWorkingWeekdaysToForm(settings.workingWeekdays);
+        refreshWorkPatternHint();
         const monthData = employees[currentEmployee][monthValue];
         if (monthData) {
           const normalizedWorkingDays = toNumber(monthData.workingDays);
           document.getElementById("quickWorkingDays").value =
             normalizedWorkingDays > 0
               ? normalizedWorkingDays
-              : getWorkingDaysInMonth(year, month);
+              : getWorkingDaysInMonth(year, month, settings.workingWeekdays);
           document.getElementById("quickAbsences").value = toNumber(
             monthData.absences,
           );
@@ -487,7 +716,7 @@
           );
         } else {
           document.getElementById("quickWorkingDays").value =
-            getWorkingDaysInMonth(year, month);
+            getWorkingDaysInMonth(year, month, settings.workingWeekdays);
           document.getElementById("quickAbsences").value = 0;
           document.getElementById("quickGiven").value = 0;
         }
@@ -600,6 +829,12 @@
 
       function saveQuickEntry() {
         if (!currentEmployee) return;
+
+        const settings = getEmployeeSettings(currentEmployee);
+        settings.workingWeekdays = normalizeWorkingWeekdays(
+          readWorkingWeekdaysFromForm(),
+        );
+        settings.planningConfigured = true;
 
         const monthValue = document.getElementById("quickMonth").value;
         const workingDays =
